@@ -8,9 +8,15 @@ st.set_page_config(page_title="Experimentation Engine", layout="wide")
 
 st.title("🚀 Experimentation & Uplift Modeling Dashboard")
 
-data_path = Path(__file__).resolve().parents[1] / "data" / "experiment_simulated.csv"
-if not data_path.exists():
-    st.error(f"Data file not found: {data_path}")
+script_dir = Path(__file__).resolve().parent
+data_candidates = [
+    script_dir / "data" / "experiment_simulated.csv",
+    script_dir.parent / "data" / "experiment_simulated.csv",
+]
+data_path = next((p for p in data_candidates if p.exists()), None)
+if data_path is None:
+    expected_paths = ", ".join(str(p) for p in data_candidates)
+    st.error(f"Data file not found. Checked: {expected_paths}")
     st.stop()
 
 df = pd.read_csv(data_path)
